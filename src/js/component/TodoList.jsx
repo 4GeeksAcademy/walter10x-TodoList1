@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const TodoList = () => {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState("");
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && task.trim() !== "") {
@@ -12,40 +13,65 @@ const TodoList = () => {
   };
 
   const handleDeleteTask = (index) => {
-    // Crear una copia de la matriz de tareas
     const newTasks = [...tasks];
-    // Eliminar el elemento en la posición 'index' de la matriz
     newTasks.splice(index, 1);
-    // Actualizar el estado con la nueva matriz que no incluye la tarea eliminada
     setTasks(newTasks);
   };
 
+  const handleMouseEnter = (index) => {
+    setHoveredIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+  };
+
+  let countMessage;
+  if (tasks.length === 0) {
+    countMessage = "añadir task";
+  } else {
+    countMessage = `${tasks.length}`;
+  }
+
   return (
-    <div>
-      <h1>Todo List</h1>
-      <input
-        type="text"
-        value={task}
-        onChange={(e) => setTask(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <div>
-        {tasks.map((task, index) => (
-          <TaskItem key={index} task={task} onDelete={() => handleDeleteTask(index)} />
-        ))}
+    <>
+      <div className="padre">
+        <h1>Todos</h1>
+        <div className="text-center">
+          <input
+            type="text"
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <div>
+            {tasks.map((task, index) => (
+              <div
+                className="task-item"
+                key={index}
+                onMouseEnter={() => handleMouseEnter(index)}
+                onMouseLeave={handleMouseLeave}
+              >
+                <p className="task-text">{task}</p>
+                {hoveredIndex === index && (
+                  <span
+                    className="delete-icon"
+                    onClick={() => handleDeleteTask(index)}
+                  >
+                    <i className="bi bi-x-lg"></i>
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <p className="count-task">Item Left {countMessage}</p>
+        </div>
+
+        <div className="sheet1">.</div>
+        <div className="sheet2">.</div>
       </div>
-    </div>
-  );
-};
-
-const TaskItem = ({ task, onDelete }) => {
-  const [showDeleteIcon, setShowDeleteIcon] = useState(false);
-
-  return (
-    <div className="task-item" onMouseEnter={() => setShowDeleteIcon(true)} onMouseLeave={() => setShowDeleteIcon(false)}>
-      <p>{task}</p>
-      {showDeleteIcon && <span className="delete-icon" onClick={onDelete}>&#10006;</span>}
-    </div>
+    </>
   );
 };
 
